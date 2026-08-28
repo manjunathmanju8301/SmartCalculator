@@ -1,4 +1,5 @@
 import express from 'express';
+import 'dotenv/config';
 import userRoutes from './routes/user-routes';
 import expressionRoutes from './routes/expression-routes';
 
