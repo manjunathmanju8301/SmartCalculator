@@ -22,11 +22,11 @@ export const getExpressionsByUserId = async (
     userId: number
 ): Promise<IExpression[]> => {
     const query = `
-SELECT id, use_id, expression, result, created_at
-FROM expression
-WHERE user_id = $1
-ORDER BY created_at DEC
-`;
+    SELECT exp_id, user_id, expression, result, created_at
+    FROM "Expressions"
+    WHERE user_id = $1
+    ORDER BY created_at DESC
+  `;
 
     const { rows } = await db.query<IExpression>(query, [userId]);
 

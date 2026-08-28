@@ -3,7 +3,9 @@ import {addExpression, getUserExpressions} from '../controllers/expression-contr
 
 const expressionRouter = express.Router();
 
-expressionRouter.post('/', addExpression);
-expressionRouter.get('/', getUserExpressions);
+
+
+expressionRouter.post('/:userId/expressions', addExpression);
+expressionRouter.get('/:userId/expressions', getUserExpressions);
 
 export default expressionRouter;
