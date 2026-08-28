@@ -7,7 +7,7 @@ export const createUser = async (name:string, email:string):Promise<any>=>{
         RETURNING *`,
         [name, email]
     );
-    reutrn result.rows[0]
+    return result.rows[0];
 };
 
 export const getUsers = async ():Promise<any> => {
