@@ -1,5 +1,6 @@
 import './App.css'
 import Calculator from './components/normal-calculator'
+import Users from './components/users'
 
 function App() {
 
@@ -13,7 +14,8 @@ function App() {
 
     return (
         <>
-            <Calculator/>
+            {/* <Calculator/> */}
+            <Users/>
             {/* <Calculator
                 items={[{ key: 'key', label: 'abc', value: 34, description: '----' }]}
                 title="Product calculator"

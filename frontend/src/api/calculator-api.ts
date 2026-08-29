@@ -3,6 +3,7 @@
 // export const queryClient = new QueryClient()
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { IExpression } from "../app-types";
 
 export const calculatorApi = createApi({
     reducerPath: 'calculatorApi',
@@ -10,13 +11,20 @@ export const calculatorApi = createApi({
         baseUrl: import.meta.env.VITE_API_URI
     }),
     endpoints: (builder) => ({
-        getExpression: builder.query({
-            query: ({userId}:{userId:number}) => ({
+        getExpression: builder.query<IExpression[], {userId:number}>({
+            query: ({userId}) => ({
                 url:`/users/${userId}/expressions`,
                 method:'GET'
             })
         }),
-        createExpression: builder.mutation({
+        createExpression: builder.mutation<
+            IExpression,
+            {
+                expression: string;
+                result: number;
+                userId: number;
+            }
+        >({
             query: ({ expression, result, userId }: { expression: string, result: number, userId:number }) => ({
                 url: `/users/${userId}/expressions`,
                 method: 'POST',
@@ -26,4 +34,4 @@ export const calculatorApi = createApi({
     }),
 });
 
-export const {useCreateExpressionMutation, useGetExpressionQuery}=calculatorApi;
+export const {useCreateExpressionMutation, useLazyGetExpressionQuery,useGetExpressionQuery}=calculatorApi;
