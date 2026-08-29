@@ -7,9 +7,9 @@ export const createExpression = async (
     result: number
 ): Promise<IExpression> => {
     const query = `
-INSERT INTO expressions (user_id, expression, result)
+INSERT INTO "Expressions" (user_id, expression, result)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, expression, result, created_at
+RETURNING exp_id, user_id, expression, result, created_at
 `;
 
     const values = [userId, expression, result];

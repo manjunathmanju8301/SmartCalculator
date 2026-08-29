@@ -1,16 +1,27 @@
-import {Request,Response} from 'express';
+import { Request, Response } from 'express';
 import * as userModel from '../models/user-model';
 
-export const createUser = async(req:Request,res:Response)=>{
-    try{
-        const {name,email}=req.body;
+export const createUser = async (req: Request, res: Response) => {
+    try {
+        const { name, email } = req.body;
 
-        const user = await userModel.createUser(name,email);
+        const user = await userModel.createUser(name, email);
 
         res.status(201).json(user);
-    }catch(error){
+    } catch (error) {
         res.status(500).json({
-            message:"failed to create user"
+            message: "failed to create user"
+        });
+    }
+}
+
+export const getUsers = async (req: Request, res: Response) => {
+    try {
+        const users = await userModel.getUsers();
+        res.status(201).json(users);
+    } catch (error) {
+        res.status(500).json({
+            message: "failed to get all users"
         });
     }
 }
