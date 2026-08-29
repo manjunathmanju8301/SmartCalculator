@@ -2,7 +2,7 @@ import db from '../config/db';
 
 export const createUser = async (name:string, email:string):Promise<any>=>{
     const result = await db.query(
-        `INSERT INTO users (name, email)
+        `INSERT INTO "Users" (name, email)
         VALUES ($1,$2)
         RETURNING *`,
         [name, email]
@@ -12,7 +12,7 @@ export const createUser = async (name:string, email:string):Promise<any>=>{
 
 export const getUsers = async ():Promise<any> => {
 const result = await db.query(
-    `SELECT * FROM users`
+    `SELECT * FROM "Users"`
 );
 
 return result.rows;
@@ -20,8 +20,8 @@ return result.rows;
 
 export const getUserById = async (id:number):Promise<any>=>{
     const result = await db.query(
-        `SELECT * FROM users
-        WHERE id = $1`,
+        `SELECT * FROM "Users"
+        WHERE user_id = $1`,
         [id]
     );
 
