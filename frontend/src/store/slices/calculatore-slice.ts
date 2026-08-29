@@ -6,8 +6,8 @@ interface ICalculationSlice {
 }
 
 const initialState: ICalculationSlice = {
-    expression: '';
-    result: null;
+    expression: '',
+    result: null
 }
 
 const calculatorSlice = createSlice({

@@ -2,8 +2,9 @@
 
 // export const queryClient = new QueryClient()
 
-import { buildClerkJSScriptAttributes } from "@clerk/react/internal";
+// import { buildClerkJSScriptAttributes } from "@clerk/react/internal";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { IUser } from "../app-types";
 
 export const userApi = createApi({
     reducerPath: 'userApi',
@@ -11,11 +12,14 @@ export const userApi = createApi({
         baseUrl: import.meta.env.VITE_API_URI
     }),
     endpoints: (builder) => ({
-        getUsers: builder.query({
+        getUsers: builder.query<IUser[], void>({
             query: () => '/users'
         }),
-        createUser: builder.mutation({
-            query: ({ name, email }: { name: string, email: string }) => ({
+        createUser: builder.mutation<
+            IUser,
+            { name: string; email: string }
+        >({
+            query: ({ name, email }) => ({
                 url: '/users',
                 method: 'POST',
                 body: { name, email }
