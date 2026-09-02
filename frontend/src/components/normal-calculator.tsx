@@ -1,11 +1,14 @@
 import { useState } from "react";
-import {  Container, Heading, Display, Expression, Answer, ErrorMessage, Keypad, Key } from "./normal-calculator-style";
+import {  Container, Display, Expression, Answer, ErrorMessage, Keypad, Key, CalcHeader, HeaderItem } from "./normal-calculator-style";
 import type {CalculatorOperation, CalculatorProps, CalculatorResult}from "./normal-calculator-style";
+import UserSelector from "./userSelector";
+import type { IUser } from "../app-types";
 
 export const Calculator = ({
 	title = "Calculator",
 	onCalculate,
 }: CalculatorProps) => {
+	 const [selectedUser, setSelectedUser] = useState<IUser>();
 	const [display, setDisplay] = useState("0");
 
 	const [storedValue, setStoredValue] = useState<number>();
@@ -345,7 +348,27 @@ export const Calculator = ({
 
 	return (
 		<Container>
-			{/* <Heading>{title}</Heading> */}
+			<CalcHeader>
+			{/* <HeaderItem>User avc</HeaderItem> */}
+			 <UserSelector
+            selectedUser={selectedUser}
+            onUserChange={(user) => {
+				console.log(user);
+                setSelectedUser(user);
+
+                // Reset calculator when user changes
+                setDisplay("0");
+                setStoredValue(undefined);
+                setPendingOperation(undefined);
+                setWaitingForOperand(false);
+                setCalculation(undefined);
+                setError("");
+                setExpression("");
+                setHasResult(false);
+            }}
+        />
+			<HeaderItem>{'History'}</HeaderItem>
+			</CalcHeader>
 			<Display aria-label="Calculator display">
 				<Expression active={!hasResult}>
 					{expression || display}

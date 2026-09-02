@@ -16,8 +16,15 @@ export interface CalculatorProps {
 
 // padding: 40px 24px 28px;
 export const Container = styled.section`
-    width: min(100%, 420px);
-    min-height: 720px;
+    // width: min(100%, 420px);
+    width: 100%;
+    max-width: 400px;
+  height: calc(100dvh - 50px);
+grid-template-rows: auto auto 1fr;
+grid-template-rows: repeat(5, minmax(0, 1fr));
+min-height: 0;
+overflow: hidden;
+    // min-height: 720px;
     padding: 16px;
     box-sizing: border-box;
     color: #f5f5f5;
@@ -27,13 +34,18 @@ export const Container = styled.section`
     font-family: inherit;
 `;
 
-export const Heading = styled.h2`
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
+export const HeaderItem = styled.b`
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    color: black;
+
+`;
+
+export const CalcHeader = styled.div`
+display:flex;
+justify-content: space-around;
+align-items: center;
+height: 50px;
+background: lightgray;
 `;
 
 export const Display = styled.output`
@@ -41,7 +53,7 @@ export const Display = styled.output`
     flex-direction: column;
     justify-content: flex-end;
     width: 100%;
-    height: 250px;
+    // height: 250px;
     overflow-x: auto;
     margin-bottom: 28px;
     padding: 40px 12px 20px;
@@ -112,7 +124,9 @@ export const Answer = styled.span<{ active: boolean }>`
 
 export const Keypad = styled.div`
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+    // grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
 `;
 
@@ -130,7 +144,10 @@ export const Key = styled.button<{ variant?: "operator" | "equals" }>`
     background: ${({ variant }) => (variant ? "#202020" : "#2c2c2c")};
     color: #f5f5f5;
     font: inherit;
-    font-size: 1.65rem;
+    // font-size: 1.65rem;
+     font-size: clamp(20px, 4vw, 32px);
+     min-width: 0;
+min-height: 0;
     font-weight: 600;
     cursor: pointer;
 

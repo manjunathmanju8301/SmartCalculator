@@ -12,7 +12,7 @@ export const createUser = async (name:string, email:string):Promise<any>=>{
 
 export const getUsers = async ():Promise<any> => {
 const result = await db.query(
-    `SELECT * FROM "Users"`
+    `SELECT * FROM "Users" ORDER BY user_id DESC`
 );
 
 return result.rows;
