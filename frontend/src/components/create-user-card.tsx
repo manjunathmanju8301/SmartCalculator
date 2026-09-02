@@ -18,6 +18,7 @@
 // });
 import { memo, useCallback, useEffect, useState } from "react";
 import { useCreateUserMutation } from "../api/user-api";
+import styled from "styled-components";
 
 export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) => {
     const [name, setName] = useState("");
@@ -34,8 +35,14 @@ export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) 
     ] = useCreateUserMutation();
 
     useEffect(() => {
+        if(isSuccess || isError) {
         onComplete();
+        }
     }, [isSuccess, error]);
+
+    const onCancel = useCallback(() => {
+        onComplete();
+    }, [onComplete]);
 
     const onCreate = useCallback(async () => {
         // Basic validation
@@ -59,7 +66,7 @@ export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) 
             setName("");
             setEmail("");
 
-            alert("User created successfully");
+            // alert("User created successfully");
         } catch (err) {
             console.error("Failed to create user:", err);
         }
@@ -115,8 +122,9 @@ export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) 
                     }}
                 />
             </div>
+<StyledCreateUserCardFooter>
 
-            <button
+            <StyledCreateUserCardButton
                 type="button"
                 onClick={onCreate}
                 disabled={isLoading}
@@ -124,10 +132,22 @@ export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) 
                     padding: "8px 12px",
                     cursor: isLoading ? "not-allowed" : "pointer",
                 }}
-            >
-                {isLoading ? "Creating..." : "Create New User"}
-            </button>
+                >
+                {isLoading ? "Creating..." : "Create"}
+            </StyledCreateUserCardButton>
 
+            <StyledCancelButton
+                type="button"
+                onClick={onCancel}
+                disabled={isLoading}
+                style={{
+                    padding: "8px 12px",
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                }}
+                >
+               Cancel
+            </StyledCancelButton>
+                </StyledCreateUserCardFooter>
             {isSuccess && (
                 <p style={{ color: "green" }}>
                     User created successfully.
@@ -142,3 +162,38 @@ export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) 
         </div>
     );
 });
+
+const StyledCreateUserCardFooter = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+`;
+
+const StyledCreateUserCardButton = styled.button`
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #02ba5b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: #707d6c;
+    }
+`;
+
+const StyledCancelButton = styled.button`
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: #adb5bd;
+    }
+`;

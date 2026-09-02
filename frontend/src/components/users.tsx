@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { useCreateUserMutation, useGetUsersQuery } from '../api/user-api';
 import { UserCard } from './user-card';
 import { CreateUserCard } from './create-user-card';
+import styled from 'styled-components';
 
 const Users = () => {
     // const navigate = useNavigate();
@@ -28,14 +29,16 @@ const Users = () => {
         <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <b style={{ margin: '6px', padding: '6px' }}>Users</b>
-                <b onClick={toggleCreateUserCard}
-                    style={{
-                        margin: '6px', padding: '6px', color: 'blue', backgroundColor: 'lightblue', border: '1px solid', borderRadius: '10%', width: '100px'
-                    }}>
+                <StyleCreateUserButton onClick={toggleCreateUserCard}
+                    // style={{
+                    //     margin: '6px', padding: '6px', color: 'blue', backgroundColor: 'lightblue', border: '1px solid', borderRadius: '10%', width: '100px'
+                    // }}>
+                    isCreateUserRendered={showCreateUser}
+                >
                     + Create User
-                </b>
+                </StyleCreateUserButton>
             </div>
-            {showCreateUser && <CreateUserCard onComplete={toggleCreateUserCard}/>}
+            {showCreateUser && <CreateUserCard onComplete={toggleCreateUserCard} />}
             {users?.map((user) => (
                 <UserCard key={user.user_id} {...user} />
             ))}
@@ -44,3 +47,18 @@ const Users = () => {
 };
 
 export default Users;
+
+const StyleCreateUserButton = styled.b<{ isCreateUserRendered: boolean }>`
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    cursor: ${props => props.isCreateUserRendered ? 'not-allowed' : 'pointer'};
+    color: ${props => props.isCreateUserRendered ? 'gray' : 'blue'};
+    transition: box-shadow 0.3s ease;
+    background-color: ${props => props.isCreateUserRendered ? 'lightgray' : 'lightblue'};
+
+    &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+`;

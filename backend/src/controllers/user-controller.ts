@@ -25,3 +25,15 @@ export const getUsers = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const deleteUser = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const user = await userModel.deleteUser(Number(id));
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(500).json({
+            message: "failed to delete user"
+        });
+    }
+}
