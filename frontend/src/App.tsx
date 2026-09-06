@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import Calculator from './components/normal-calculator'
-import Users from './components/users'
+import Calculator from './components/calculator/normal-calculator'
+import Users from './components/user/users'
 import { useCallback, useState } from 'react';
 
 function App() {
@@ -12,15 +12,15 @@ function App() {
     }, [])
 
     return (
-        <>
+        <AppContainer>
             <StyledAppContainer>
                 {displayScreen === 'users' ? <Users /> : null}
                 {displayScreen === 'calculator' ? <Calculator /> : null}
 
             </StyledAppContainer>
             <FooterContainer>
-                <FooterItem isSelected={displayScreen==='users'} onClick={() => onFooterItem('users')}>Users</FooterItem>
-                <FooterItem isSelected={displayScreen==='calculator'} onClick={() => onFooterItem('calculator')}>Calculator</FooterItem>
+                <FooterItem isSelected={displayScreen === 'users'} onClick={() => onFooterItem('users')}>Users</FooterItem>
+                <FooterItem isSelected={displayScreen === 'calculator'} onClick={() => onFooterItem('calculator')}>Calculator</FooterItem>
             </FooterContainer>
             {/* <Calculator
                 items={[{ key: 'key', label: 'abc', value: 34, description: '----' }]}
@@ -28,11 +28,19 @@ function App() {
                 valueLabel="per item"
                 valuePrefix="₹"
                 onCalculate={handleCalculation} /> */}
-        </>
+        </AppContainer>
     )
 }
 
 export default App
+
+
+const AppContainer = styled.div`
+display: flex;
+flex-direction: column;
+height: calc(100dvh - 0px);
+    justify-content: center;
+`;
 
 const FooterContainer = styled.div`
 display:flex;
@@ -45,7 +53,7 @@ background-color: lightgray;
 width: 100%;
 `;
 
-const FooterItem = styled.div<{isSelected:boolean}>`
+const FooterItem = styled.div<{ isSelected: boolean }>`
 margin: 8px;
 height: 30px;
 align-content: center;
@@ -55,7 +63,7 @@ text-align: center;
 color: blue;
 font-weight: 600;
 border: 2px lightblue;
-background: ${({isSelected})=>(isSelected?'lightblue':'lightgray')};
+background: ${({ isSelected }) => (isSelected ? 'lightblue' : 'lightgray')};
 cursor: pointer;
 `;
 

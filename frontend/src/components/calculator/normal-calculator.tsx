@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {  Container, Display, Expression, Answer, ErrorMessage, Keypad, Key, CalcHeader, HeaderItem } from "./normal-calculator-style";
 import type {CalculatorOperation, CalculatorProps, CalculatorResult}from "./normal-calculator-style";
-import UserSelector from "./userSelector";
-import type { IUser } from "../app-types";
+import UserSelector from "../user/userSelector-dropdown";
+import type { IUser } from "../../app-types";
 
 export const Calculator = ({
 	title = "Calculator",

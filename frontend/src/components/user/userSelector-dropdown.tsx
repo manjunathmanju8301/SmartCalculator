@@ -1,5 +1,5 @@
-import { useGetUsersQuery } from "../api/user-api";
-import type { IUser } from "../app-types";
+import { useGetUsersQuery } from "../../api/user-api";
+import type { IUser } from "../../app-types";
 
 interface UserSelectorProps {
     selectedUser?: IUser;

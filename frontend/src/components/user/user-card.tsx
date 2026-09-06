@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useLazyGetExpressionQuery } from '../api/calculator-api';
-import type { IUser } from '../app-types';
-import { useDeleteUserMutation } from '../api/user-api';
+import { useLazyGetExpressionQuery } from '../../api/calculator-api';
+import type { IUser } from '../../app-types';
+import { useDeleteUserMutation } from '../../api/user-api';
 
 export const UserCard = memo((user: IUser) => {
 

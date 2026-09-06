@@ -17,7 +17,7 @@
 //     </>)
 // });
 import { memo, useCallback, useEffect, useState } from "react";
-import { useCreateUserMutation } from "../api/user-api";
+import { useCreateUserMutation } from "../../api/user-api";
 import styled from "styled-components";
 
 export const CreateUserCard = memo(({ onComplete }: { onComplete: () => void }) => {
