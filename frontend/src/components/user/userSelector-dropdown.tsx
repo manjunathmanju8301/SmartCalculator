@@ -1,13 +1,16 @@
+import { useMemo } from "react";
 import { useGetUsersQuery } from "../../api/user-api";
 import type { IUser } from "../../app-types";
 
 interface UserSelectorProps {
     selectedUser?: IUser;
+    isGust: boolean;
     onUserChange: (user: IUser) => void;
 }
 
 const UserSelector = ({
     selectedUser,
+    isGust,
     onUserChange,
 }: UserSelectorProps) => {
 
@@ -37,16 +40,26 @@ const UserSelector = ({
         }
     };
 
+    const sortedUsers = useMemo(
+        () =>
+            users
+                ? [...users].sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                )
+                : [],
+        [users]
+    );
+    const selectedValue = useMemo(() => ((isGust || !selectedUser?.user_id) ? "" : selectedUser?.user_id), [isGust, selectedUser?.user_id]);
     return (
         <select
-            value={selectedUser?.user_id ?? ""}
+            value={selectedValue}
             onChange={handleChange}
         >
             <option value="" disabled>
-                Select user
+                Gust user
             </option>
 
-            {users?.map((user) => (
+            {sortedUsers?.map((user) => (
                 <option
                     key={user.user_id}
                     value={user.user_id}
