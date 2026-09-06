@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import type { IUser } from "../../../app-types";
 
 export type CalculatorOperation = "+" | "-" | "*" | "/";
 
@@ -11,12 +12,16 @@ export interface CalculatorResult {
 
 export interface CalculatorProps {
     title?: string;
+    user?:IUser;
+    isGustUser:boolean;
     onCalculate?: (result: CalculatorResult) => void;
 }
 
 // padding: 40px 24px 28px;
 export const Container = styled.section`
     // width: min(100%, 420px);
+    display: flex;
+    flex-direction: column;
     width: 100%;
     max-width: 400px;
   height: calc(100dvh - 50px);
@@ -25,7 +30,7 @@ grid-template-rows: repeat(5, minmax(0, 1fr));
 min-height: 0;
 overflow: hidden;
     // min-height: 720px;
-    padding: 16px;
+    padding: 0px 16px 16px 16px;
     box-sizing: border-box;
     color: #f5f5f5;
     background: #000000;
@@ -45,6 +50,7 @@ display:flex;
 justify-content: space-around;
 align-items: center;
 height: 50px;
+width: 100%;
 background: lightgray;
 `;
 
@@ -53,7 +59,7 @@ export const Display = styled.output`
     flex-direction: column;
     justify-content: flex-end;
     width: 100%;
-    // height: 250px;
+    height: 100%;
     overflow-x: auto;
     margin-bottom: 28px;
     padding: 40px 12px 20px;
@@ -122,7 +128,7 @@ export const Answer = styled.span<{ active: boolean }>`
     transition: color 160ms ease, font-size 160ms ease;
 `;
 
-export const Keypad = styled.div`
+export const StyledKeypad = styled.div`
     display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: repeat(5, minmax(0, 1fr));
@@ -136,7 +142,7 @@ export const ErrorMessage = styled.p`
     font-size: 0.875rem;
 `;
 
-export const Key = styled.button<{ variant?: "operator" | "equals" }>`
+export const StyledKey = styled.button<{ variant?: "operator" | "equals" }>`
     aspect-ratio: 1;
     padding: 8px;
     border: 0;

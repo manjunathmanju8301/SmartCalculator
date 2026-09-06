@@ -1,26 +1,35 @@
 import styled from 'styled-components'
-import Calculator from './components/normal-calculator'
-import Users from './components/users'
+import Calculator from './components/calculator/normal/normal-calculator'
+import Users from './components/user/users'
 import { useCallback, useState } from 'react';
+import type { IUser } from './app-types';
 
 function App() {
 
     const [displayScreen, setDisplayScreen] = useState<'users' | 'calculator'>('users');
+    const [selectedUser, setSelectedUser] = useState<IUser | undefined>(undefined);
 
-    const onFooterItem = useCallback((arg: 'users' | 'calculator') => {
+    const handleUserSelection = useCallback((user: IUser) => {
+        setSelectedUser(user);
+        setDisplayScreen('calculator');
+        // Perform any additional actions with the selected user ID
+    }, []);
+
+    const handleFooter = useCallback((arg: 'users' | 'calculator') => {
         setDisplayScreen(arg);
+        setSelectedUser(undefined); // Reset selected user when switching screens
     }, [])
 
     return (
-        <>
-            <StyledAppContainer>
-                {displayScreen === 'users' ? <Users /> : null}
-                {displayScreen === 'calculator' ? <Calculator /> : null}
+        <AppContainer>
+            <StyledAppContentContainer>
+                {displayScreen === 'users' ? <Users onUserSelect={handleUserSelection} /> : null}
+                {displayScreen === 'calculator' ? <Calculator user={selectedUser} isGustUser={!!selectedUser} /> : null}
 
-            </StyledAppContainer>
+            </StyledAppContentContainer>
             <FooterContainer>
-                <FooterItem isSelected={displayScreen==='users'} onClick={() => onFooterItem('users')}>Users</FooterItem>
-                <FooterItem isSelected={displayScreen==='calculator'} onClick={() => onFooterItem('calculator')}>Calculator</FooterItem>
+                <FooterItem isSelected={displayScreen === 'users'} onClick={() => handleFooter('users')}>Users</FooterItem>
+                <FooterItem isSelected={displayScreen === 'calculator'} onClick={() => handleFooter('calculator')}>Calculator</FooterItem>
             </FooterContainer>
             {/* <Calculator
                 items={[{ key: 'key', label: 'abc', value: 34, description: '----' }]}
@@ -28,11 +37,19 @@ function App() {
                 valueLabel="per item"
                 valuePrefix="₹"
                 onCalculate={handleCalculation} /> */}
-        </>
+        </AppContainer>
     )
 }
 
 export default App
+
+
+const AppContainer = styled.div`
+display: flex;
+flex-direction: column;
+height: calc(100dvh - 0px);
+    justify-content: center;
+`;
 
 const FooterContainer = styled.div`
 display:flex;
@@ -45,22 +62,27 @@ background-color: lightgray;
 width: 100%;
 `;
 
-const FooterItem = styled.div<{isSelected:boolean}>`
+const FooterItem = styled.div<{ isSelected: boolean }>`
 margin: 8px;
 height: 30px;
 align-content: center;
 min-width: 100px;
-border-radius: 20%;
+border-radius: 10px;
 text-align: center;
 color: blue;
 font-weight: 600;
-border: 2px lightblue;
-background: ${({isSelected})=>(isSelected?'lightblue':'lightgray')};
+border: 1px solid blue;
+background: ${({ isSelected }) => (isSelected ? 'lightblue' : 'lightgray')};
 cursor: pointer;
+ &:hover {
+        box-shadow: 0 4px 8px rgba(0, 64, 255, 0.4);
+    }
 `;
 
-const StyledAppContainer = styled.div`
+const StyledAppContentContainer = styled.div`
 display: flex;
+flex-direction: column;
+align-items: center;
 height: calc(100dvh - 50px);
     justify-content: center;
 
