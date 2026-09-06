@@ -1,17 +1,22 @@
-import { useState } from "react";
-import {  Container, Display, Expression, Answer, ErrorMessage, Keypad, Key, CalcHeader, HeaderItem } from "./normal-calculator-style";
-import type {CalculatorOperation, CalculatorProps, CalculatorResult}from "./normal-calculator-style";
-import UserSelector from "../user/userSelector-dropdown";
-import type { IUser } from "../../app-types";
+import { memo, useCallback, useEffect, useState } from "react";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { Container, Display, Expression, Answer, ErrorMessage, } from "./normal-calculator-style";
+import type { CalculatorOperation, CalculatorProps, CalculatorResult } from "./normal-calculator-style";
+import type { IUser } from "../../../app-types";
+import { Keypad } from "./key-buttons";
+import { CalculatorHeader } from "./calculator-header";
+import { useGetExpressionQuery } from "../../../api/calculator-api";
 
-export const Calculator = ({
+export const Calculator = memo(({
 	title = "Calculator",
 	onCalculate,
+	user, isGustUser
 }: CalculatorProps) => {
-	 const [selectedUser, setSelectedUser] = useState<IUser>();
+	const { data, isError, isLoading } = useGetExpressionQuery(user?.user_id ? { userId: user!.user_id } : skipToken, { skip: !user?.user_id });
+	const [selectedUser, setSelectedUser] = useState<IUser | undefined>(user);
 	const [display, setDisplay] = useState("0");
 
-	const [storedValue, setStoredValue] = useState<number>();
+	const [storedValue, setStoredValue] = useState<number | undefined>(undefined);
 
 	const [pendingOperation, setPendingOperation] =
 		useState<CalculatorOperation>();
@@ -25,6 +30,16 @@ export const Calculator = ({
 	const [expression, setExpression] = useState("");
 
 	const [hasResult, setHasResult] = useState(false);
+
+	useEffect(() => {
+    if (isLoading) {
+        console.log("Loading expressions for user:", user?.user_id);
+    } else if (isError) {
+        console.log("Failed to load expressions");
+    } else {
+        console.log("User:", user?.user_id, "expressions:", data);
+    }
+}, [isLoading, isError, data, user?.user_id]);
 
 	/*
 	 * Enter a number.
@@ -154,7 +169,7 @@ export const Calculator = ({
 	const chooseOperation = (
 		nextOperation: CalculatorOperation,
 	) => {
-	
+
 		if (hasResult && calculation) {
 			setStoredValue(calculation.result);
 
@@ -346,162 +361,54 @@ export const Calculator = ({
 		return value.length;
 	};
 
+	const onUserChange = useCallback((user: IUser|undefined) => {
+		setSelectedUser(user);
+		// Reset calculator when user changes
+		setDisplay("0");
+		setStoredValue(undefined);
+		setPendingOperation(undefined);
+		setWaitingForOperand(false);
+		setCalculation(undefined);
+		setError("");
+		setExpression("");
+		setHasResult(false);
+	}, [])
+
 	return (
-		<Container>
-			<CalcHeader>
-			{/* <HeaderItem>User avc</HeaderItem> */}
-			 <UserSelector
-            selectedUser={selectedUser}
-            onUserChange={(user) => {
-				console.log(user);
-                setSelectedUser(user);
+		<>
+			<CalculatorHeader
+				onUserChange={onUserChange}
+				user={selectedUser as IUser}
+				isGustUser={isGustUser}
+			/>
+			<Container>
+				<Display aria-label="Calculator display">
+					<Expression active={!hasResult}>
+						{expression || display}
+					</Expression>
 
-                // Reset calculator when user changes
-                setDisplay("0");
-                setStoredValue(undefined);
-                setPendingOperation(undefined);
-                setWaitingForOperand(false);
-                setCalculation(undefined);
-                setError("");
-                setExpression("");
-                setHasResult(false);
-            }}
-        />
-			<HeaderItem>{'History'}</HeaderItem>
-			</CalcHeader>
-			<Display aria-label="Calculator display">
-				<Expression active={!hasResult}>
-					{expression || display}
-				</Expression>
+					<Answer active={hasResult}>
+						{display}
+					</Answer>
+				</Display>
 
-				<Answer active={hasResult}>
-					{display}
-				</Answer>
-			</Display>
+				{error && (
+					<ErrorMessage role="alert">
+						{error}
+					</ErrorMessage>
+				)}
 
-			{error && (
-				<ErrorMessage role="alert">
-					{error}
-				</ErrorMessage>
-			)}
-
-			<Keypad>
-				<Key
-					type="button"
-					onClick={clear}
-				>
-					C
-				</Key>
-
-				<Key
-					type="button"
-					onClick={backspace}
-					aria-label="Backspace"
-				>
-					&lt;
-				</Key>
-
-				<Key
-					type="button"
-					onClick={percent}
-				>
-					%
-				</Key>
-
-				<Key
-					type="button"
-					variant="operator"
-					onClick={() => chooseOperation("-")}
-				>
-					-
-				</Key>
-
-				{["1", "2", "3"].map((digit) => (
-					<Key
-						key={digit}
-						type="button"
-						onClick={() => enterDigit(digit)}
-					>
-						{digit}
-					</Key>
-				))}
-
-				<Key
-					type="button"
-					variant="operator"
-					onClick={() => chooseOperation("*")}
-				>
-					*
-				</Key>
-
-				{["4", "5", "6"].map((digit) => (
-					<Key
-						key={digit}
-						type="button"
-						onClick={() => enterDigit(digit)}
-					>
-						{digit}
-					</Key>
-				))}
-
-				<Key
-					type="button"
-					variant="operator"
-					onClick={() => chooseOperation("/")}
-				>
-					/
-				</Key>
-
-				{["7", "8", "9"].map((digit) => (
-					<Key
-						key={digit}
-						type="button"
-						onClick={() => enterDigit(digit)}
-					>
-						{digit}
-					</Key>
-				))}
-
-				<Key
-					type="button"
-					variant="operator"
-					onClick={() => chooseOperation("+")}
-				>
-					+
-				</Key>
-
-				<Key
-					type="button"
-					onClick={() => enterDigit("0")}
-				>
-					0
-				</Key>
-
-				<Key
-					type="button"
-					onClick={() => enterDigit("00")}
-				>
-					00
-				</Key>
-
-				<Key
-					type="button"
-					onClick={enterDecimal}
-				>
-					.
-				</Key>
-
-				<Key
-					type="button"
-					variant="equals"
-					data-equals="true"
-					onClick={equals}
-				>
-					=
-				</Key>
-			</Keypad>
-		</Container>
+				<Keypad
+					chooseOperation={chooseOperation}
+					enterDigit={enterDigit}
+					enterDecimal={enterDecimal}
+					clear={clear}
+					backspace={backspace}
+					percent={percent}
+					equals={equals} />
+			</Container>
+		</>
 	);
-};
+});
 
 export default Calculator;

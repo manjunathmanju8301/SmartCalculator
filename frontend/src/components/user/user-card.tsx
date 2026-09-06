@@ -1,49 +1,30 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useLazyGetExpressionQuery } from '../../api/calculator-api';
 import type { IUser } from '../../app-types';
-import { useDeleteUserMutation } from '../../api/user-api';
 
-export const UserCard = memo((user: IUser) => {
+interface IUserCardProps {
+    user: IUser;
+    onUserClick: (userId: IUser) => void;
+    onDeleteUser: (userId: IUser) => Promise<void>;
+}
 
-    const [getExpressions, { data, isLoading, isError }] = useLazyGetExpressionQuery();
-    const [deleteUser, { isSuccess, isError: isDeleteError, data: deleteData }] = useDeleteUserMutation();
+export const UserCard = memo(({ user, onUserClick, onDeleteUser }: IUserCardProps) => {
+
     const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
 
-    useEffect(() => {
-        if (isSuccess || isDeleteError) {
-            setDeletingUserId(null);
-        }
-    }, [isSuccess, isDeleteError]);
+    const handleUserClick = useCallback(() => {
+        onUserClick(user);
+    }, [onUserClick, user]);
 
-    const onUserClick = useCallback(async () => {
-        const res = await getExpressions({ userId: user.user_id });
-        console.log('userid: ', user.user_id, ', res: ', res)
-        console.log('userid: ', user.user_id, ', data: ', data)
-    }, [getExpressions]);
-
-    const onDeleteUser = useCallback(async () => {
+    const handleDeleteUser = useCallback(async () => {
         setDeletingUserId(user.user_id);
-        try {
-            console.log('Deleting user with id:', deleteData);
-            await deleteUser({ id: user.user_id }).unwrap();
-            console.log('User deleted successfully');
-        } catch (err) {
-            console.error('Failed to delete user:', err);
-        }
-    }, [deleteUser, user.user_id]);
+        await onDeleteUser(user);
+    }, [user, onDeleteUser]);
 
-    if (isLoading) {
-        return <p>Loading users...</p>;
-    }
-
-    if (isError) {
-        return <p>Failed to load users.</p>;
-    }
     return (
         <StyleUserCard
             key={user.user_id}
-            onClick={onUserClick}
+            onClick={handleUserClick}
             isDeleting={deletingUserId === user.user_id}
         >
             <h3>{user.name}</h3>
@@ -51,13 +32,13 @@ export const UserCard = memo((user: IUser) => {
             <StyleUserCardFooter>
                 <StyleUserCardButton onClick={(e) => {
                     e.stopPropagation();
-                    onUserClick();
+                    handleUserClick();
                 }}>
                     View Expressions
                 </StyleUserCardButton>
                 <StyledUserCardDelete onClick={(e) => {
                     e.stopPropagation();
-                    onDeleteUser();
+                    handleDeleteUser();
                 }}>
                     {deletingUserId === user.user_id ? 'Deleting...' : 'Delete'}
                 </StyledUserCardDelete>

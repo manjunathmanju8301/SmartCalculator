@@ -1,12 +1,20 @@
 // import { useNavigate } from 'react-router-dom';
-import { useCallback, useState } from 'react';
-import { useCreateUserMutation, useGetUsersQuery } from '../../api/user-api';
+import { memo, useCallback, useState } from 'react';
+import {useDeleteUserMutation, useGetUsersQuery } from '../../api/user-api';
 import { UserCard } from './user-card';
 import { CreateUserCard } from './create-user-card';
 import styled from 'styled-components';
+import type { IUser } from '../../app-types';
 
-const Users = () => {
-    // const navigate = useNavigate();
+interface IUserProps {
+    onUserSelect: (userId: IUser) => void;
+}
+
+const Users = memo((props: IUserProps) => {
+    const { onUserSelect } = props;
+    const [deleteUser, 
+        // { isSuccess, isError: isDeleteError, data: deleteData }
+    ] = useDeleteUserMutation();
     const [showCreateUser, setShowCreateUser] = useState<boolean>(false);
     const {
         data: users,
@@ -17,6 +25,18 @@ const Users = () => {
     const toggleCreateUserCard = useCallback(() => {
         setShowCreateUser(preState => !preState);
     }, [])
+    const handleUserClick = useCallback((user: IUser) => {
+        onUserSelect(user);
+    }, [onUserSelect]);
+
+    const handleDeleteUser = useCallback(async (user: IUser) => {
+        try {
+            await deleteUser({ id: user.user_id }).unwrap();
+        } catch (err) {
+            console.error('Failed to delete user:', err);
+        }
+    }, [deleteUser]);
+
     if (isLoading) {
         return <p>Loading users...</p>;
     }
@@ -38,12 +58,12 @@ const Users = () => {
             <StyledCardsContainer>
                 {showCreateUser && <CreateUserCard onComplete={toggleCreateUserCard} />}
                 {users?.map((user) => (
-                    <UserCard key={user.user_id} {...user} />
+                    <UserCard key={user.user_id} user={user} onUserClick={handleUserClick} onDeleteUser={handleDeleteUser} />
                 ))}
             </StyledCardsContainer>
         </div>
     );
-};
+});
 
 export default Users;
 
