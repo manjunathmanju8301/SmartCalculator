@@ -1,4 +1,4 @@
-import styled from "@emotion/styled";
+import styled from "styled-components";
 import type { IUser } from "../../../app-types";
 
 export type CalculatorOperation = "+" | "-" | "*" | "/";
@@ -13,8 +13,10 @@ export interface CalculatorResult {
 export interface CalculatorProps {
     title?: string;
     user?:IUser;
+     setSelectedUser: React.Dispatch<React.SetStateAction<IUser | undefined>>
     isGustUser:boolean;
-    onCalculate?: (result: CalculatorResult) => void;
+    onUserChange?: (user: IUser | undefined) => void;
+    onCalculate?: (expression: string, result: number) => Promise<void>;
 }
 
 // padding: 40px 24px 28px;

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useGetUsersQuery } from "../../api/user-api";
 import type { IUser } from "../../app-types";
+import { defaultGustUserInfo } from "../../constants/app-constants";
 
 interface UserSelectorProps {
     selectedUser?: IUser;
@@ -10,7 +11,6 @@ interface UserSelectorProps {
 
 const UserSelector = ({
     selectedUser,
-    isGust,
     onUserChange,
 }: UserSelectorProps) => {
 
@@ -19,26 +19,6 @@ const UserSelector = ({
         isLoading,
         isError,
     } = useGetUsersQuery();
-
-    if (isLoading) {
-        return <span>Loading...</span>;
-    }
-
-    if (isError) {
-        return <span>Failed to load users</span>;
-    }
-
-    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const userId = Number(event.target.value);
-
-        const user = users?.find(
-            (user) => Number(user.user_id) === userId
-        );
-
-        if (user) {
-            onUserChange(user);
-        }
-    };
 
     const sortedUsers = useMemo(
         () =>
@@ -49,13 +29,40 @@ const UserSelector = ({
                 : [],
         [users]
     );
-    const selectedValue = useMemo(() => ((isGust || !selectedUser?.user_id) ? "" : selectedUser?.user_id), [isGust, selectedUser?.user_id]);
+
+    const selectedValue = useMemo(
+        () => (selectedUser?.user_id ? selectedUser?.user_id : "-1"),
+        [selectedUser]
+    );
+
+    if (isLoading) {
+        return <span>Loading...</span>;
+    }
+
+    if (isError) {
+        return <span>Failed to load users</span>;
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const eventValue = event.target.value;
+        if (eventValue !== '-1') {
+            const userId = Number(eventValue);
+            const user = users?.find(
+                (user) => Number(user.user_id) === userId
+            );
+            onUserChange(user as IUser);
+        }else{
+            onUserChange(defaultGustUserInfo);
+        }
+
+    };
+
     return (
         <select
             value={selectedValue}
             onChange={handleChange}
         >
-            <option value="" disabled>
+            <option value="-1">
                 Gust user
             </option>
 

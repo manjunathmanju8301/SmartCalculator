@@ -4,11 +4,12 @@ import type { IUser } from '../../app-types';
 
 interface IUserCardProps {
     user: IUser;
+    selectedUser:IUser;
     onUserClick: (userId: IUser) => void;
     onDeleteUser: (userId: IUser) => Promise<void>;
 }
 
-export const UserCard = memo(({ user, onUserClick, onDeleteUser }: IUserCardProps) => {
+export const UserCard = memo(({ user, onUserClick, onDeleteUser, selectedUser }: IUserCardProps) => {
 
     const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
 
@@ -26,6 +27,7 @@ export const UserCard = memo(({ user, onUserClick, onDeleteUser }: IUserCardProp
             key={user.user_id}
             onClick={handleUserClick}
             isDeleting={deletingUserId === user.user_id}
+            isSelected={user.user_id === selectedUser?.user_id} // You can manage the selected state as needed
         >
             <h3>{user.name}</h3>
             <p>{user.email}</p>
@@ -48,11 +50,11 @@ export const UserCard = memo(({ user, onUserClick, onDeleteUser }: IUserCardProp
     );
 });
 
-const StyleUserCard = styled.div<{ isDeleting: boolean }>`
+const StyleUserCard = styled.div<{ isDeleting: boolean, isSelected?: boolean }>`
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 16px;
-    margin: 8px 0;
+    margin: 0;
     cursor: pointer;
     transition: box-shadow 0.3s ease;
     background-color: ${props => props.isDeleting ? '#f8d7da' : 'white'};
@@ -60,6 +62,11 @@ const StyleUserCard = styled.div<{ isDeleting: boolean }>`
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+          ${({ isSelected }) => (isSelected && `
+         background: #e8f1ff;
+  border: 2px solid #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+  `)}
 `;
 
 const StyleUserCardFooter = styled.div`

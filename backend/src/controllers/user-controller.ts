@@ -3,14 +3,16 @@ import * as userModel from '../models/user-model';
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, isGust } = req.body;
 
-        const user = await userModel.createUser(name, email);
+        const user = await userModel.createUser(name, email, isGust);
 
         res.status(201).json(user);
     } catch (error) {
+        console.log("Error creating user:", error);
         res.status(500).json({
-            message: "failed to create user"
+            message: "failed to create user",
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 }
@@ -20,6 +22,7 @@ export const getUsers = async (req: Request, res: Response) => {
         const users = await userModel.getUsers();
         res.status(201).json(users);
     } catch (error) {
+        console.log("Error fetching users:", error);
         res.status(500).json({
             message: "failed to get all users"
         });
@@ -32,6 +35,7 @@ export const deleteUser = async (req: Request, res: Response) => {
         const user = await userModel.deleteUser(Number(id));
         res.status(201).json(user);
     } catch (error) {
+        console.error("Error deleting user:", error);
         res.status(500).json({
             message: "failed to delete user"
         });

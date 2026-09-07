@@ -3,15 +3,18 @@ import { memo, useCallback, useState } from 'react';
 import {useDeleteUserMutation, useGetUsersQuery } from '../../api/user-api';
 import { UserCard } from './user-card';
 import { CreateUserCard } from './create-user-card';
-import styled from 'styled-components';
 import type { IUser } from '../../app-types';
+import { StyleCreateUserButton, StyledCardsContainer } from './styles';
+import { defaultGustUserInfo } from '../../constants/app-constants';
 
 interface IUserProps {
     onUserSelect: (userId: IUser) => void;
+    selectedUser:IUser;
+    setSelectedUser: React.Dispatch<React.SetStateAction<IUser | undefined>>;
 }
 
 const Users = memo((props: IUserProps) => {
-    const { onUserSelect } = props;
+    const { onUserSelect, selectedUser, setSelectedUser } = props;
     const [deleteUser, 
         // { isSuccess, isError: isDeleteError, data: deleteData }
     ] = useDeleteUserMutation();
@@ -31,11 +34,15 @@ const Users = memo((props: IUserProps) => {
 
     const handleDeleteUser = useCallback(async (user: IUser) => {
         try {
-            await deleteUser({ id: user.user_id }).unwrap();
+            const result = await deleteUser({ id: user.user_id }).unwrap();
+            if(result) {
+                console.log('User deleted successfully:', result);
+                setSelectedUser(defaultGustUserInfo); // Reset to default gust user after deletion
+            }
         } catch (err) {
             console.error('Failed to delete user:', err);
         }
-    }, [deleteUser]);
+    }, [deleteUser, setSelectedUser]);
 
     if (isLoading) {
         return <p>Loading users...</p>;
@@ -58,7 +65,7 @@ const Users = memo((props: IUserProps) => {
             <StyledCardsContainer>
                 {showCreateUser && <CreateUserCard onComplete={toggleCreateUserCard} />}
                 {users?.map((user) => (
-                    <UserCard key={user.user_id} user={user} onUserClick={handleUserClick} onDeleteUser={handleDeleteUser} />
+                    <UserCard key={user.user_id} user={user}   selectedUser={selectedUser} onUserClick={handleUserClick} onDeleteUser={handleDeleteUser} />
                 ))}
             </StyledCardsContainer>
         </div>
@@ -66,28 +73,3 @@ const Users = memo((props: IUserProps) => {
 });
 
 export default Users;
-
-const StyledCardsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    width: 100%;
-    height: calc(100% - 50px); // Adjust height to account for the header
-    box-sizing: border-box;
-    overflow-y: auto;
-`;
-
-const StyleCreateUserButton = styled.b<{ isCreateUserRendered: boolean }>`
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 16px;
-    cursor: ${props => props.isCreateUserRendered ? 'not-allowed' : 'pointer'};
-    color: ${props => props.isCreateUserRendered ? 'gray' : 'blue'};
-    transition: box-shadow 0.3s ease;
-    background-color: ${props => props.isCreateUserRendered ? 'lightgray' : 'lightblue'};
-
-    &:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-`;

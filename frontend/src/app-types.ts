@@ -2,6 +2,7 @@ export interface IUser {
     user_id: number;
     name: string;
     email: string;
+    is_gust:boolean;
     created_at: string;
 }
 
