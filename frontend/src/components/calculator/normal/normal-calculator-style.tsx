@@ -1,4 +1,4 @@
-import styled from "@emotion/styled";
+import styled from "styled-components";
 import type { IUser } from "../../../app-types";
 
 export type CalculatorOperation = "+" | "-" | "*" | "/";

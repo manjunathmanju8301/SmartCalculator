@@ -7,6 +7,7 @@ import type { IExpression } from "../app-types";
 
 export const calculatorApi = createApi({
     reducerPath: 'calculatorApi',
+    tagTypes: ['Expression'], // is used for cache data keep update along with data mutation
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_API_URI
     }),
@@ -15,7 +16,10 @@ export const calculatorApi = createApi({
             query: ({userId}) => ({
                 url:`/users/${userId}/expressions`,
                 method:'GET'
-            })
+            }),
+            providesTags: (_result, _error, { userId }) => [ // Provide a tag for the specific user ID to enable cache invalidation
+                { type: 'Expression', id: userId },
+            ],
         }),
         createExpression: builder.mutation<
             IExpression,
@@ -29,7 +33,10 @@ export const calculatorApi = createApi({
                 url: `/users/${userId}/expressions`,
                 method: 'POST',
                 body: { expression, result }
-            })
+            }),
+            invalidatesTags: (_result, _error, { userId }) => [ // Invalidate the cache for the specific user ID to trigger a refetch
+                { type: 'Expression', id: userId },
+            ],
         })
     }),
 });
