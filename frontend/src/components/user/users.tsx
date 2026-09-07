@@ -5,14 +5,16 @@ import { UserCard } from './user-card';
 import { CreateUserCard } from './create-user-card';
 import type { IUser } from '../../app-types';
 import { StyleCreateUserButton, StyledCardsContainer } from './styles';
+import { defaultGustUserInfo } from '../../constants/app-constants';
 
 interface IUserProps {
     onUserSelect: (userId: IUser) => void;
     selectedUser:IUser;
+    setSelectedUser: React.Dispatch<React.SetStateAction<IUser | undefined>>;
 }
 
 const Users = memo((props: IUserProps) => {
-    const { onUserSelect, selectedUser } = props;
+    const { onUserSelect, selectedUser, setSelectedUser } = props;
     const [deleteUser, 
         // { isSuccess, isError: isDeleteError, data: deleteData }
     ] = useDeleteUserMutation();
@@ -32,11 +34,15 @@ const Users = memo((props: IUserProps) => {
 
     const handleDeleteUser = useCallback(async (user: IUser) => {
         try {
-            await deleteUser({ id: user.user_id }).unwrap();
+            const result = await deleteUser({ id: user.user_id }).unwrap();
+            if(result) {
+                console.log('User deleted successfully:', result);
+                setSelectedUser(defaultGustUserInfo); // Reset to default gust user after deletion
+            }
         } catch (err) {
             console.error('Failed to delete user:', err);
         }
-    }, [deleteUser]);
+    }, [deleteUser, setSelectedUser]);
 
     if (isLoading) {
         return <p>Loading users...</p>;
