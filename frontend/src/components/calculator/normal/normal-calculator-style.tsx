@@ -13,6 +13,7 @@ export interface CalculatorResult {
 export interface CalculatorProps {
     title?: string;
     user?:IUser;
+     setSelectedUser: React.Dispatch<React.SetStateAction<IUser | undefined>>
     isGustUser:boolean;
     onUserChange?: (user: IUser | undefined) => void;
     onCalculate?: (expression: string, result: number) => Promise<void>;

@@ -7,13 +7,13 @@ import { Keypad } from "./key-buttons";
 import { CalculatorHeader } from "./calculator-header";
 import { useGetExpressionQuery } from "../../../api/calculator-api";
 import { History } from './history';
+
 export const Calculator = memo(({
-	title = "Calculator",
 	onCalculate,
-	user, isGustUser, onUserChange: _onUserChange
+	setSelectedUser,
+	user, onUserChange: _onUserChange
 }: CalculatorProps) => {
 	const { data, isError, isLoading } = useGetExpressionQuery(user?.user_id ? { userId: user!.user_id } : skipToken, { skip: !user?.user_id });
-	const [selectedUser, setSelectedUser] = useState<IUser | undefined>(user);
 	const [display, setDisplay] = useState("0");
 
 	const [storedValue, setStoredValue] = useState<number | undefined>(undefined);
@@ -375,20 +375,20 @@ export const Calculator = memo(({
 		setError("");
 		setExpression("");
 		setHasResult(false);
-	}, [])
+	}, [_onUserChange, setSelectedUser])
 
 	return (
 		<>
 			<CalculatorHeader
 				onUserChange={onUserChange}
-				user={selectedUser as IUser}
+				user={user as IUser}
+				isGustUser={!!user?.is_gust}
 				onHistoryToggle={() => { setShowHistory((prev) => !prev); console.log("History toggled:", !showHistory) }}
-				isGustUser={isGustUser}
 				isHistoryEnabled={showHistory}
 			/>
 			<Container>
-				{(showHistory && selectedUser?.user_id) ?
-					<History userId={selectedUser?.user_id} /> :
+				{(showHistory && user?.user_id) ?
+					<History userId={user?.user_id} /> :
 					<>
 						<Display aria-label="Calculator display">
 							<Expression active={!hasResult}>

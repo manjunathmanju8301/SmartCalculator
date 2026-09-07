@@ -9,8 +9,10 @@ export const createUser = async (req: Request, res: Response) => {
 
         res.status(201).json(user);
     } catch (error) {
+        console.log("Error creating user:", error);
         res.status(500).json({
-            message: "failed to create user"
+            message: "failed to create user",
+            error: error instanceof Error ? error.message : String(error)
         });
     }
 }
@@ -20,6 +22,7 @@ export const getUsers = async (req: Request, res: Response) => {
         const users = await userModel.getUsers();
         res.status(201).json(users);
     } catch (error) {
+        console.log("Error fetching users:", error);
         res.status(500).json({
             message: "failed to get all users"
         });

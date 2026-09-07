@@ -10,7 +10,6 @@ interface UserSelectorProps {
 
 const UserSelector = ({
     selectedUser,
-    isGust,
     onUserChange,
 }: UserSelectorProps) => {
 
@@ -19,6 +18,21 @@ const UserSelector = ({
         isLoading,
         isError,
     } = useGetUsersQuery();
+
+    const sortedUsers = useMemo(
+        () =>
+            users
+                ? [...users].sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                )
+                : [],
+        [users]
+    );
+
+    const selectedValue = useMemo(
+        () => (selectedUser?.user_id ? "" : selectedUser?.user_id),
+        [selectedUser]
+    );
 
     if (isLoading) {
         return <span>Loading...</span>;
@@ -46,22 +60,12 @@ const UserSelector = ({
         }
     };
 
-    const sortedUsers = useMemo(
-        () =>
-            users
-                ? [...users].sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                )
-                : [],
-        [users]
-    );
-    const selectedValue = useMemo(() => ((isGust || !selectedUser?.user_id) ? "" : selectedUser?.user_id), [isGust, selectedUser?.user_id]);
     return (
         <select
             value={selectedValue}
             onChange={handleChange}
         >
-            <option value="gust_user">
+            <option value="-1">
                 Gust user
             </option>
 

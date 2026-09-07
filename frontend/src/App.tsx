@@ -11,8 +11,8 @@ function App() {
 
     const [displayScreen, setDisplayScreen] = useState<'users' | 'calculator'>('users');
     const [selectedUser, setSelectedUser] = useState<IUser | undefined>(defaultGustUserInfo);
-    const [createExpression, { }] = useCreateExpressionMutation();
-    const [createUser, { }] = useCreateUserMutation();
+    const [createExpression] = useCreateExpressionMutation();
+    const [createUser] = useCreateUserMutation();
 
     const handleUserSelection = useCallback((user: IUser | undefined) => {
         setSelectedUser(user);
@@ -30,9 +30,10 @@ function App() {
 
     const handlCalculationUpload = useCallback(async (expression: string, result: number) => {
         if (selectedUser?.is_gust) {
-            const newGustUser = await createUser({ name: `User ${getRandomNumber()}`, email: 'gust@example.com', isGust: true });
+            const gustUserName = `User${getRandomNumber()}`;
+            const newGustUser = await createUser({ name: gustUserName, email: `${gustUserName}@example.com`, isGust: true });
             if (newGustUser.data) {
-
+                setSelectedUser(newGustUser.data);
                 const { data } = await createExpression({ expression, result, userId: newGustUser.data?.user_id });
                 console.log('Uploaded calculation for new Gust user:', newGustUser.data.user_id, 'Expression:', expression, 'Result:', result, 'Response:', data);
             }
@@ -44,7 +45,7 @@ function App() {
         } else {
             console.log('No user selected. Cannot upload calculation.');
         }
-    }, [selectedUser]);
+    }, [createExpression, createUser, selectedUser]);
 
     return (
         <AppContainer>
@@ -57,6 +58,7 @@ function App() {
                 {displayScreen === 'calculator' ?
                     <Calculator
                         user={selectedUser}
+                        setSelectedUser={setSelectedUser}
                         onCalculate={handlCalculationUpload}
                         isGustUser={!selectedUser?.user_id}
                         onUserChange={handleUserSelection} /> : null}

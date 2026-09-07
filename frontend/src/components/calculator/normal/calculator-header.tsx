@@ -1,20 +1,20 @@
 import { memo, useCallback } from "react"
 import UserSelector from "../../user/userSelector-dropdown";
-import { CalcHeader, HeaderItem, type CalculatorProps } from "./normal-calculator-style";
+import { CalcHeader, type CalculatorProps } from "./normal-calculator-style";
 import type { IUser } from "../../../app-types";
-import { StyleCreateUserButton } from "../../user/users";
-
-
+import { StyleCreateUserButton } from "../../user/styles";
 
 export const CalculatorHeader = memo((props: { onUserChange: (user: IUser | undefined) => void, isHistoryEnabled: boolean, onHistoryToggle: () => void } & Pick<CalculatorProps, 'isGustUser' | 'user'>) => {
     const { onUserChange, onHistoryToggle, user, isGustUser, isHistoryEnabled } = props;
-
-
-    console.log('isGustuser', isGustUser, 'isHistoryEnabled', isHistoryEnabled, 'user', user)
-
+console.log("CalculatorHeader props:", { onUserChange, onHistoryToggle, user, isGustUser, isHistoryEnabled });
     const handleHistory = useCallback(() => {
-        isGustUser ? alert('Please select a user to view history') : onHistoryToggle()
-    }, [isGustUser])
+        if (isGustUser) {
+            alert('Please select a user to view history')
+            return
+        }
+
+        onHistoryToggle()
+    }, [isGustUser, onHistoryToggle])
 
     return (
 
