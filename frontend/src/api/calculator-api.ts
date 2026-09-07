@@ -11,7 +11,7 @@ export const calculatorApi = createApi({
         baseUrl: import.meta.env.VITE_API_URI
     }),
     endpoints: (builder) => ({
-        getExpression: builder.query<IExpression[], {userId:number}>({
+        getExpression: builder.query<{message:string, data:IExpression[]}, {userId:number}>({
             query: ({userId}) => ({
                 url:`/users/${userId}/expressions`,
                 method:'GET'

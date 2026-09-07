@@ -14,7 +14,8 @@ export interface CalculatorProps {
     title?: string;
     user?:IUser;
     isGustUser:boolean;
-    onCalculate?: (result: CalculatorResult) => void;
+    onUserChange?: (user: IUser | undefined) => void;
+    onCalculate?: (expression: string, result: number) => Promise<void>;
 }
 
 // padding: 40px 24px 28px;

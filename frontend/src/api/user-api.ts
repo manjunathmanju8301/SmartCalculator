@@ -11,22 +11,19 @@ export const userApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_API_URI
     }),
-    tagTypes:['Users'],
+    tagTypes: ['Users'],
     endpoints: (builder) => ({
         getUsers: builder.query<IUser[], void>({
             query: () => '/users',
-            providesTags:['Users']
+            providesTags: ['Users']
         }),
-        createUser: builder.mutation<
-            IUser,
-            { name: string; email: string }
-        >({
-            query: ({ name, email }) => ({
+        createUser: builder.mutation<IUser, { name: string; email: string, isGust?: boolean }>({
+            query: ({ name, email, isGust = false }) => ({
                 url: '/users',
                 method: 'POST',
-                body: { name, email }   
+                body: { name, email, isGust }
             }),
-            invalidatesTags:['Users']
+            invalidatesTags: ['Users']
         }),
         deleteUser: builder.mutation<
             IUser,
@@ -36,9 +33,9 @@ export const userApi = createApi({
                 url: `/users/${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags:['Users']
+            invalidatesTags: ['Users']
         })
     }),
 });
 
-export const {useCreateUserMutation, useGetUsersQuery, useDeleteUserMutation } = userApi;
+export const { useCreateUserMutation, useGetUsersQuery, useDeleteUserMutation } = userApi;

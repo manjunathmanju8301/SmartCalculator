@@ -3,28 +3,63 @@ import Calculator from './components/calculator/normal/normal-calculator'
 import Users from './components/user/users'
 import { useCallback, useState } from 'react';
 import type { IUser } from './app-types';
+import { useCreateExpressionMutation } from './api/calculator-api';
+import { useCreateUserMutation } from './api/user-api';
+import { defaultGustUserInfo, getRandomNumber } from './constants/app-constants';
 
 function App() {
 
     const [displayScreen, setDisplayScreen] = useState<'users' | 'calculator'>('users');
-    const [selectedUser, setSelectedUser] = useState<IUser | undefined>(undefined);
+    const [selectedUser, setSelectedUser] = useState<IUser | undefined>(defaultGustUserInfo);
+    const [createExpression, { }] = useCreateExpressionMutation();
+    const [createUser, { }] = useCreateUserMutation();
 
-    const handleUserSelection = useCallback((user: IUser) => {
+    const handleUserSelection = useCallback((user: IUser | undefined) => {
         setSelectedUser(user);
         setDisplayScreen('calculator');
         // Perform any additional actions with the selected user ID
     }, []);
 
+
     const handleFooter = useCallback((arg: 'users' | 'calculator') => {
         setDisplayScreen(arg);
-        setSelectedUser(undefined); // Reset selected user when switching screens
+        setSelectedUser(preState => (
+            (preState && !preState?.is_gust && preState?.user_id > 0) ? preState : defaultGustUserInfo
+        )); // Reset selected user when switching screens
     }, [])
+
+    const handlCalculationUpload = useCallback(async (expression: string, result: number) => {
+        if (selectedUser?.is_gust) {
+            const newGustUser = await createUser({ name: `User ${getRandomNumber()}`, email: 'gust@example.com', isGust: true });
+            if (newGustUser.data) {
+
+                const { data } = await createExpression({ expression, result, userId: newGustUser.data?.user_id });
+                console.log('Uploaded calculation for new Gust user:', newGustUser.data.user_id, 'Expression:', expression, 'Result:', result, 'Response:', data);
+            }
+
+        } else if (selectedUser?.user_id) {
+            console.log('Uploading calculation for user:', selectedUser.user_id, 'Expression:', expression, 'Result:', result);
+            await createExpression({ expression, result, userId: selectedUser.user_id });
+            // Perform the upload logic here
+        } else {
+            console.log('No user selected. Cannot upload calculation.');
+        }
+    }, [selectedUser]);
 
     return (
         <AppContainer>
             <StyledAppContentContainer>
-                {displayScreen === 'users' ? <Users onUserSelect={handleUserSelection} /> : null}
-                {displayScreen === 'calculator' ? <Calculator user={selectedUser} isGustUser={!!selectedUser} /> : null}
+                {displayScreen === 'users' ?
+                    <Users
+                        onUserSelect={handleUserSelection}
+                        selectedUser={selectedUser as IUser}
+                    /> : null}
+                {displayScreen === 'calculator' ?
+                    <Calculator
+                        user={selectedUser}
+                        onCalculate={handlCalculationUpload}
+                        isGustUser={!selectedUser?.user_id}
+                        onUserChange={handleUserSelection} /> : null}
 
             </StyledAppContentContainer>
             <FooterContainer>

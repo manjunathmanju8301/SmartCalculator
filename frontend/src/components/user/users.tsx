@@ -8,10 +8,11 @@ import type { IUser } from '../../app-types';
 
 interface IUserProps {
     onUserSelect: (userId: IUser) => void;
+    selectedUser:IUser;
 }
 
 const Users = memo((props: IUserProps) => {
-    const { onUserSelect } = props;
+    const { onUserSelect, selectedUser } = props;
     const [deleteUser, 
         // { isSuccess, isError: isDeleteError, data: deleteData }
     ] = useDeleteUserMutation();
@@ -58,7 +59,7 @@ const Users = memo((props: IUserProps) => {
             <StyledCardsContainer>
                 {showCreateUser && <CreateUserCard onComplete={toggleCreateUserCard} />}
                 {users?.map((user) => (
-                    <UserCard key={user.user_id} user={user} onUserClick={handleUserClick} onDeleteUser={handleDeleteUser} />
+                    <UserCard key={user.user_id} user={user}   selectedUser={selectedUser} onUserClick={handleUserClick} onDeleteUser={handleDeleteUser} />
                 ))}
             </StyledCardsContainer>
         </div>
@@ -70,19 +71,19 @@ export default Users;
 const StyledCardsContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 8px;
+    padding: 8px;
     width: 100%;
     height: calc(100% - 50px); // Adjust height to account for the header
     box-sizing: border-box;
     overflow-y: auto;
 `;
 
-const StyleCreateUserButton = styled.b<{ isCreateUserRendered: boolean }>`
+export const StyleCreateUserButton = styled.b<{ isCreateUserRendered?: boolean, isDisabled?: boolean }>`
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 16px;
-    cursor: ${props => props.isCreateUserRendered ? 'not-allowed' : 'pointer'};
+    cursor: ${props => (props.isCreateUserRendered || props.isDisabled) ? 'not-allowed' : 'pointer'};
     color: ${props => props.isCreateUserRendered ? 'gray' : 'blue'};
     transition: box-shadow 0.3s ease;
     background-color: ${props => props.isCreateUserRendered ? 'lightgray' : 'lightblue'};

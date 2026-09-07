@@ -6,11 +6,11 @@ import type { IUser } from "../../../app-types";
 import { Keypad } from "./key-buttons";
 import { CalculatorHeader } from "./calculator-header";
 import { useGetExpressionQuery } from "../../../api/calculator-api";
-
+import { History } from './history';
 export const Calculator = memo(({
 	title = "Calculator",
 	onCalculate,
-	user, isGustUser
+	user, isGustUser, onUserChange: _onUserChange
 }: CalculatorProps) => {
 	const { data, isError, isLoading } = useGetExpressionQuery(user?.user_id ? { userId: user!.user_id } : skipToken, { skip: !user?.user_id });
 	const [selectedUser, setSelectedUser] = useState<IUser | undefined>(user);
@@ -31,15 +31,17 @@ export const Calculator = memo(({
 
 	const [hasResult, setHasResult] = useState(false);
 
+	const [showHistory, setShowHistory] = useState(false);
+
 	useEffect(() => {
-    if (isLoading) {
-        console.log("Loading expressions for user:", user?.user_id);
-    } else if (isError) {
-        console.log("Failed to load expressions");
-    } else {
-        console.log("User:", user?.user_id, "expressions:", data);
-    }
-}, [isLoading, isError, data, user?.user_id]);
+		if (isLoading) {
+			console.log("Loading expressions for user:", user?.user_id);
+		} else if (isError) {
+			console.log("Failed to load expressions");
+		} else {
+			console.log("User:", user?.user_id, "expressions:", data);
+		}
+	}, [isLoading, isError, data, user?.user_id]);
 
 	/*
 	 * Enter a number.
@@ -305,7 +307,7 @@ export const Calculator = memo(({
 		 */
 		setHasResult(true);
 
-		onCalculate?.(calculationResult);
+		onCalculate?.(expression, calculationResult.result);
 	};
 
 	/*
@@ -361,7 +363,8 @@ export const Calculator = memo(({
 		return value.length;
 	};
 
-	const onUserChange = useCallback((user: IUser|undefined) => {
+	const onUserChange = useCallback((user: IUser | undefined) => {
+		_onUserChange?.(user);
 		setSelectedUser(user);
 		// Reset calculator when user changes
 		setDisplay("0");
@@ -379,33 +382,39 @@ export const Calculator = memo(({
 			<CalculatorHeader
 				onUserChange={onUserChange}
 				user={selectedUser as IUser}
+				onHistoryToggle={() => { setShowHistory((prev) => !prev); console.log("History toggled:", !showHistory) }}
 				isGustUser={isGustUser}
+				isHistoryEnabled={showHistory}
 			/>
 			<Container>
-				<Display aria-label="Calculator display">
-					<Expression active={!hasResult}>
-						{expression || display}
-					</Expression>
+				{(showHistory && selectedUser?.user_id) ?
+					<History userId={selectedUser?.user_id} /> :
+					<>
+						<Display aria-label="Calculator display">
+							<Expression active={!hasResult}>
+								{expression || display}
+							</Expression>
 
-					<Answer active={hasResult}>
-						{display}
-					</Answer>
-				</Display>
+							<Answer active={hasResult}>
+								{display}
+							</Answer>
+						</Display>
 
-				{error && (
-					<ErrorMessage role="alert">
-						{error}
-					</ErrorMessage>
-				)}
+						{error && (
+							<ErrorMessage role="alert">
+								{error}
+							</ErrorMessage>
+						)}
 
-				<Keypad
-					chooseOperation={chooseOperation}
-					enterDigit={enterDigit}
-					enterDecimal={enterDecimal}
-					clear={clear}
-					backspace={backspace}
-					percent={percent}
-					equals={equals} />
+						<Keypad
+							chooseOperation={chooseOperation}
+							enterDigit={enterDigit}
+							enterDecimal={enterDecimal}
+							clear={clear}
+							backspace={backspace}
+							percent={percent}
+							equals={equals} />
+					</>}
 			</Container>
 		</>
 	);

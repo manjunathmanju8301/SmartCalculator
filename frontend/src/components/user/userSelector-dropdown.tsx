@@ -29,14 +29,20 @@ const UserSelector = ({
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const userId = Number(event.target.value);
+        let user;
+        const eventValue = event.target.value;
+        if (eventValue=== 'gust_user') {
+            user = { user_id: -1, name: 'Gust User', is_gust: true, email:'gust@example.com' } as IUser;
+        } else {
 
-        const user = users?.find(
-            (user) => Number(user.user_id) === userId
-        );
+            const userId = Number(eventValue);
+            user = users?.find(
+                (user) => Number(user.user_id) === userId
+            );
+        }
 
         if (user) {
-            onUserChange(user);
+            onUserChange(user as IUser);
         }
     };
 
@@ -55,7 +61,7 @@ const UserSelector = ({
             value={selectedValue}
             onChange={handleChange}
         >
-            <option value="" disabled>
+            <option value="gust_user">
                 Gust user
             </option>
 
